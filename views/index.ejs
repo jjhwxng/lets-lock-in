@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/stylesheets/style.css" />
+</head>
+<body>
+    <div class="top-tip-bar">
+        <div class="scroll-text">
+            💡 Stay hydrated • Try the Pomodoro technique: Take a 5 minute break every 20 minutes • You got this! • Eat a snack! A bit of sugar can help you focus •
+            💡 Stay hydrated • Try the Pomodoro technique: Take a 5 minute break every 20 minutes • You got this! • Eat a snack! A bit of sugar can help you focus •
+        </div>
+    </div>
+    <div class="page">
+        <!-- Left panel -->
+        <aside class="sidebar">
+            <div class="brand">
+                <h1>LET’S LOCK IN!</h1>
+            </div>
+
+            <section class="quick-card">
+                <button class="plus-btn">+</button>
+                <h2>New assignment/event</h2>
+
+                <form id="addTaskForm" class="quick-fields">
+                    <div class="field-row">
+                        <span class="field-label">Task</span>
+                        <input id="taskNameInput" class="field-input" type="text" placeholder="Task name" required />
+                    </div>
+
+                    <div class="field-row">
+                        <span class="field-label">Priority</span>
+                        <input id="priorityInput" class="field-input" type="number" placeholder="1-5" min="1" max="5" required />
+                    </div>
+
+                    <div class="field-row">
+                        <span class="field-label">Estimated Time</span>
+                        <input id="timeInput" class="field-input" type="number" placeholder="minutes" required />
+                    </div>
+
+                    <div class="field-row">
+                        <span class="field-label">User ID</span>
+                        <input id="userIdInput" class="field-input" type="number" placeholder="optional" />
+                    </div>
+
+                    <div class="field-row">
+                        <span class="field-label">Class</span>
+                        <select id="classIdInput" class="field-input" style="appearance: auto; padding: 4px;">
+                            <option value="">-- select class --</option>
+                        </select>
+                    </div>
+                </form>
+            </section>
+
+            <section class="task-list-card">
+                <div class="section-header">
+                    <h3>Upcoming Tasks</h3>
+                    <div>
+                        <input id="searchInput" type="text" placeholder="Search tasks..." />
+                        <button id="searchBtn" class="secondary-btn">Search</button>
+                        <button id="loadTasksBtn" class="secondary-btn">Load Tasks</button>
+                    </div>
+                </div>
+
+                <div id="taskList" class="task-list">
+                    <div class="placeholder">Press “Load Tasks” to retrieve tasks from the database.</div>
+                </div>
+            </section>
+        </aside>
+
+        <!-- Right content -->
+        <main class="main-content">
+            <section class="top-controls">
+                <div class="options-box">
+                    <div class="options-header">Options</div>
+                    <div class="options-body">
+                        <div class="login-section">
+                            <label for="userSelect">Login:</label>
+                            <select id="userSelect">
+                                <option value="">-- select user --</option>
+                            </select>
+                        </div>
+                        <div class="button-section">
+                            <button id="loadClassesBtn" class="secondary-btn">Load Classes</button>
+                            <button id="generateBtn" class="primary-btn">Generate Schedule!</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="dashboard-row">
+                <div class="calendar-card">
+                    <div class="calendar-header">
+                        <div>
+                            <h2><%= date %></h2>
+			    <p><%= weekday %></p>
+                        </div>
+                    </div>
+
+                    <div class="calendar-grid">
+                        <div class="time-label">8 AM</div>
+                        <div class="calendar-slot" id="slot-8"></div>
+
+                        <div class="time-label">9 AM</div>
+                        <div class="calendar-slot" id="slot-9"></div>
+
+                        <div class="time-label">10 AM</div>
+                        <div class="calendar-slot" id="slot-10"></div>
+
+                        <div class="time-label">11 AM</div>
+                        <div class="calendar-slot" id="slot-11"></div>
+
+                        <div class="time-label">12 PM</div>
+                        <div class="calendar-slot" id="slot-12"></div>
+
+                        <div class="time-label">1 PM</div>
+                        <div class="calendar-slot" id="slot-13"></div>
+
+                        <div class="time-label">2 PM</div>
+                        <div class="calendar-slot" id="slot-14"></div>
+
+                        <div class="time-label">3 PM</div>
+                        <div class="calendar-slot" id="slot-15"></div>
+
+                        <div class="time-label">4 PM</div>
+                        <div class="calendar-slot" id="slot-16"></div>
+
+                        <div class="time-label">5 PM</div>
+                        <div class="calendar-slot" id="slot-17"></div>
+                    </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="class-results-card">
+                <div class="section-header">
+                    <h3>Classes</h3>
+                </div>
+                <div id="classList" class="class-list">
+                    <div class="placeholder">Press “Load Classes” to retrieve classes from the database.</div>
+                </div>
+            </section>
+
+            <section class="class-results-card">
+    <div class="section-header">
+        <h3>Workload Statistics</h3>
+        <button id="loadStatsBtn" class="secondary-btn">Load Statistics</button>
+    </div>
+
+    <div id="statsList">
+        <div class="placeholder">Press "Load Statistics" to retrieve workload data.</div>
+    </div>
+</section>
+        </main>
+    </div>
+
+    <script>
+        const taskList = document.getElementById('taskList');
+        const classList = document.getElementById('classList');
+        const loadTasksBtn = document.getElementById('loadTasksBtn');
+        const loadClassesBtn = document.getElementById('loadClassesBtn');
+        const generateBtn = document.getElementById('generateBtn');
+        const searchInput = document.getElementById('searchInput');
+        const searchBtn = document.getElementById('searchBtn');
+        const plusBtn = document.querySelector('.plus-btn');
+        const addTaskForm = document.getElementById('addTaskForm');
+
+        plusBtn.addEventListener('click', async () => {
+            const newTask = {
+                TaskName: document.getElementById('taskNameInput').value,
+                Priority: document.getElementById('priorityInput').value,
+                EstimatedTime: document.getElementById('timeInput').value,
+                UserID: document.getElementById('userIdInput').value || null,
+                ClassID: document.getElementById('classIdInput').value || null
+            };
+
+            if (!newTask.TaskName || !newTask.Priority || !newTask.EstimatedTime) {
+                alert('Please fill in task name, priority, and estimated time.');
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/tasks', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(newTask)
+                });
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                    alert(data.message || 'Failed to add task');
+                    return;
+                }
+
+                alert(`Task added! New TaskID: ${data.TaskID}`);
+
+                document.getElementById('addTaskForm').reset();
+
+                searchInput.value = newTask.TaskName;
+                searchBtn.click();
+
+            } catch (err) {
+                console.error(err);
+                alert('Error adding task');
+            }
+        });
+
+        addTaskForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const newTask = {
+                TaskName: document.getElementById('taskNameInput').value,
+                Priority: document.getElementById('priorityInput').value,
+                EstimatedTime: document.getElementById('timeInput').value,
+                UserID: document.getElementById('userIdInput').value || null,
+                ClassID: document.getElementById('classIdInput').value || null
+            };
+
+            try {
+                const res = await fetch('/api/tasks', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(newTask)
+                });
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                    alert(data.message || 'Failed to add task');
+                    return;
+                }
+
+                alert('Task added!');
+                addTaskForm.reset();
+                addTaskForm.classList.add('hidden');
+
+                loadTasksBtn.click();
+
+            } catch (err) {
+                console.error(err);
+                alert('Error adding task');
+            }
+        });
+
+        searchBtn.addEventListener('click', async () => {
+            const keyword = searchInput.value.trim();
+
+            if (!keyword) {
+                taskList.innerHTML = '<div class="placeholder">Please enter a keyword.</div>';
+                return;
+            }
+
+            taskList.innerHTML = '<div class="placeholder">Searching tasks...</div>';
+
+            try {
+                const res = await fetch(`/api/search-tasks?q=${encodeURIComponent(keyword)}`);
+                const tasks = await res.json();
+
+                if (!Array.isArray(tasks) || tasks.length === 0) {
+                    taskList.innerHTML = '<div class="placeholder">No matching tasks found.</div>';
+                    return;
+                }
+
+                taskList.innerHTML = tasks.map(task => `
+                    <div class="task-item" id="task-${task.TaskID}">
+                    <div class="view-mode">
+                        <div class="task-title" id="view-name-${task.TaskID}">
+                            ${task.TaskName}
+                        </div>
+                        <div class="task-meta">
+                            <span id="view-priority-${task.TaskID}">
+                                Priority: ${task.Priority}
+                            </span>
+                            <span id="view-time-${task.TaskID}">
+                                Estimated: ${task.EstimatedTime} min
+                            </span>
+                        </div>
+
+                        <button class="delete-task-btn" onclick="deleteTask(${task.TaskID})">
+                            Delete
+                        </button>
+                        <button class="update-task-btn" onclick="enableEdit(${task.TaskID})">
+                            Edit
+                        </button>
+                    </div>
+                    <div class="edit-mode hidden">
+                        <input id="edit-name-${task.TaskID}" value="${task.TaskName}" />
+                        <input id="edit-priority-${task.TaskID}" value="${task.Priority}" />
+                        <input id="edit-time-${task.TaskID}" value="${task.EstimatedTime}" />
+
+                        <button onclick="saveEdit(${task.TaskID})">Done</button>
+                        <button onclick="cancelEdit(${task.TaskID})">Cancel</button>
+                    </div>
+                </div>
+                `).join('');
+            } catch (err) {
+                console.error(err);
+                taskList.innerHTML = '<div class="placeholder error">Search failed.</div>';
+            }
+        });
+
+        loadTasksBtn.addEventListener('click', async () => {
+            taskList.innerHTML = '<div class="placeholder">Loading tasks...</div>';
+
+            try {
+                const selectedUser = document.getElementById('userSelect').value;
+                const url = selectedUser ? `/api/tasks?userId=${selectedUser}` : '/api/tasks';
+                const res = await fetch(url);
+                const tasks = await res.json();
+
+                if (!Array.isArray(tasks) || tasks.length === 0) {
+                    taskList.innerHTML = '<div class="placeholder">No tasks found.</div>';
+                    return;
+                }
+
+                taskList.innerHTML = tasks.map(task => `
+                <div class="task-item" id="task-${task.TaskID}">
+                    <div class="view-mode">
+                        <div class="task-title" id="view-name-${task.TaskID}">
+                            ${task.TaskName}
+                        </div>
+                        <div class="task-meta">
+                            <span id="view-priority-${task.TaskID}">
+                                Priority: ${task.Priority}
+                            </span>
+                            <span id="view-time-${task.TaskID}">
+                                Estimated: ${task.EstimatedTime} min
+                            </span>
+                        </div>
+
+                        <button class="delete-task-btn" onclick="deleteTask(${task.TaskID})">
+                            Delete
+                        </button>
+                        <button class="update-task-btn" onclick="enableEdit(${task.TaskID})">
+                            Edit
+                        </button>
+                    </div>
+                    <div class="edit-mode hidden">
+                        <input id="edit-name-${task.TaskID}" value="${task.TaskName}" />
+                        <input id="edit-priority-${task.TaskID}" value="${task.Priority}" />
+                        <input id="edit-time-${task.TaskID}" value="${task.EstimatedTime}" />
+
+                        <button onclick="saveEdit(${task.TaskID})">Done</button>
+                        <button onclick="cancelEdit(${task.TaskID})">Cancel</button>
+                    </div>
+                </div>
+            `).join('');
+            } catch (err) {
+                console.error(err);
+                taskList.innerHTML = '<div class="placeholder error">Could not load tasks.</div>';
+            }
+        });
+
+        loadClassesBtn.addEventListener('click', async () => {
+            classList.innerHTML = '<div class="placeholder">Loading classes...</div>';
+
+            try {
+                const res = await fetch('/api/classes');
+                const classes = await res.json();
+
+                if (!Array.isArray(classes) || classes.length === 0) {
+                    classList.innerHTML = '<div class="placeholder">No classes found.</div>';
+                    return;
+                }
+
+                classList.innerHTML = `
+                    <table class="class-table">
+                        <thead>
+                            <tr>
+                                <th>Class</th>
+                                <th>Start</th>
+                                <th>End</th>
+                                <th>Days</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${classes.map(c => `
+                                <tr>
+                                    <td>${c.ClassName}</td>
+                                    <td>${String(c.StartTime).slice(0, 5)}</td>
+                                    <td>${String(c.EndTime).slice(0, 5)}</td>
+                                    <td>${c.Days}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+            } catch (err) {
+                console.error(err);
+                classList.innerHTML = '<div class="placeholder error">Could not load classes.</div>';
+            }
+        });
+
+        // Load users into dropdown on page load
+        async function loadUsers() {
+            try {
+                const res = await fetch('/api/users');
+                const users = await res.json();
+                const select = document.getElementById('userSelect');
+
+                users.forEach(u => {
+                    const option = document.createElement('option');
+                    option.value = u.UserID;
+                    option.textContent = `User ${u.UserID}`;
+                    select.appendChild(option);
+                });
+            } catch (err) {
+                console.error('Failed to load users:', err);
+            }
+        }
+
+        loadUsers(); // run on page load
+
+        // Load classes into dropdown on page load
+        async function loadClassesDropdown() {
+            try {
+                const res = await fetch('/api/classes');
+                const classes = await res.json();
+                const select = document.getElementById('classIdInput');
+
+                classes.forEach(c => {
+                    const option = document.createElement('option');
+                    option.value = c.ClassID;
+                    option.textContent = c.ClassName;
+                    select.appendChild(option);
+                });
+            } catch (err) {
+                console.error('Failed to load classes:', err);
+            }
+        }
+
+        loadClassesDropdown(); // run on page load
+
+        async function deleteTask(taskId) {
+            if (!confirm('Delete this task?')) {
+                return;
+            }
+
+            try {
+                const res = await fetch(`/api/tasks/${taskId}`, {
+                    method: 'DELETE'
+                });
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                    alert(data.message || 'Failed to delete task');
+                    return;
+                }
+
+                alert('Task deleted!');
+                loadTasksBtn.click();
+
+            } catch (err) {
+                console.error(err);
+                alert('Error deleting task');
+            }
+        }
+
+
+        function enableEdit(taskId) {
+            const task = document.getElementById(`task-${taskId}`);
+            task.querySelector('.view-mode').classList.add('hidden');
+            task.querySelector('.edit-mode').classList.remove('hidden');
+        }
+
+        function cancelEdit(taskId) {
+            const task = document.getElementById(`task-${taskId}`);
+            task.querySelector('.view-mode').classList.remove('hidden');
+            task.querySelector('.edit-mode').classList.add('hidden');
+        }
+
+        function saveEdit(taskId) {
+            const TaskName = document.getElementById(`edit-name-${taskId}`).value;
+            const Priority = document.getElementById(`edit-priority-${taskId}`).value;
+            const EstimatedTime = document.getElementById(`edit-time-${taskId}`).value;
+
+            fetch(`/api/tasks/${taskId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    TaskName,
+                    Priority,
+                    EstimatedTime
+                })
+            })
+            .then(res => res.json())
+            .then(() => {
+                // update UI immediately (no reload needed)
+                document.getElementById(`view-name-${taskId}`).innerText = TaskName;
+                document.getElementById(`view-priority-${taskId}`).innerText = `Priority: ${Priority}`;
+                document.getElementById(`view-time-${taskId}`).innerText = `${EstimatedTime} mins`;
+
+                cancelEdit(taskId);
+            })
+            .catch(err => console.error("Update failed:", err));
+        }
+
+        generateBtn.addEventListener('click', async () => {
+            const selectedUser = document.getElementById('userSelect').value;
+
+            if (!selectedUser) {
+                alert('Please select a User ID first.');
+                return;
+            }
+
+            try {
+                await fetch('/api/generate-schedule', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ UserID: parseInt(selectedUser) })
+                });
+
+                const res = await fetch(`/api/schedule?userId=${selectedUser}`);  // pass user
+                const blocks = await res.json();
+
+                // clear calendar
+                for (let i = 8; i <= 17; i++) {
+                    document.getElementById(`slot-${i}`).innerHTML = '';
+                }
+
+                if (!Array.isArray(blocks) || blocks.length === 0) {
+                    alert('No blocks generated. Make sure tasks are assigned to this user.');
+                    return;
+                }
+
+                // render calendar blocks
+                blocks.forEach(block => {
+                    const hour = parseInt(block.Start.split(':')[0]);
+                    const slot = document.getElementById(`slot-${hour}`);
+                    if (!slot) return;
+
+                    const div = document.createElement('div');
+
+                    if (block.IsClass) {
+                        div.className = 'event class-event';
+                        div.innerText = `${block.TaskName} - ${block.ClassID}\n${block.Start} - ${block.End}`;
+                    } else {
+                        if (block.Priority >= 4) {
+                            div.className = 'event priority-high';
+                        } else if (block.Priority >= 2) {
+                            div.className = 'event priority-medium';
+                        } else {
+                            div.className = 'event priority-low';
+                        }
+                        div.innerText = `${block.TaskName}\n${block.Start} - ${block.End}`;
+                    }
+                    slot.appendChild(div);
+                });
+
+            } catch (err) {
+                console.error(err);
+                alert('Failed to generate schedule');
+            }
+        });
+
+        document.getElementById('loadStatsBtn').addEventListener('click', async () => {
+    const statsList = document.getElementById('statsList');
+    statsList.innerHTML = '<div class="placeholder">Loading statistics...</div>';
+
+    try {
+        const res = await fetch('/api/statistics');
+        const data = await res.json();
+
+        const { AboveAvgWorkload, MajorWorkload } = data;
+
+        statsList.innerHTML = `
+            <h4 style="margin: 0 0 10px;">Users Above Their Major's Average Workload</h4>
+            <table class="class-table">
+                <thead>
+                    <tr>
+                        <th>User ID</th>
+                        <th>Name</th>
+                        <th>Major</th>
+                        <th>Total Minutes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${AboveAvgWorkload.map(row => `
+                        <tr>
+                            <td>${row.UserID}</td>
+                            <td>${row.Name}</td>
+                            <td>${row.Major}</td>
+                            <td>${row.total_estimated_minutes}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+
+            <h4 style="margin: 20px 0 10px;">Average Workload by Major</h4>
+            <table class="class-table">
+                <thead>
+                    <tr>
+                        <th>Major</th>
+                        <th>Avg Workload (min)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${MajorWorkload.map(row => `
+                        <tr>
+                            <td>${row.Major}</td>
+                            <td>${parseFloat(row.Average).toFixed(1)}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        `;
+
+    } catch (err) {
+        console.error(err);
+        document.getElementById('statsList').innerHTML = 
+            '<div class="placeholder error">Could not load statistics.</div>';
+    }
+});
+        
+    </script>
+</body>
+</html>
