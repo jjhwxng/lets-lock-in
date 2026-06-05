@@ -17,7 +17,7 @@ I focused mainly on the frontend and integration side of the project. My contrib
 ### System Architecture
 
 <p align="center">
-  <img src="docs/assets/system-architecture.png" alt="Let's Lock In system architecture" width="900" />
+  <img src="docs/assets/system-architecture.png" alt="Let's Lock In system architecture" width="600" />
 </p>
 
 The dashboard communicates with a Node/Express backend through REST-style API endpoints. The backend queries a MySQL database, calls stored procedures for schedule generation, and returns task/class/schedule data to the frontend.
@@ -25,7 +25,7 @@ The dashboard communicates with a Node/Express backend through REST-style API en
 ### Dashboard Preview
 
 <p align="center">
-  <img src="docs/assets/dashboard-preview.png" alt="Let's Lock In dashboard and generated schedule preview" width="850" />
+  <img src="docs/assets/dashboard-preview.png" alt="Let's Lock In dashboard and generated schedule preview" width="600" />
 </p>
 
 The interface includes a task-entry panel, task list, class loading controls, keyword search, and a generated schedule view.
