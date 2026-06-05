@@ -114,7 +114,3 @@ By default, the server runs at:
 ```txt
 http://localhost:3000
 ```
-
-## Security Note
-
-The original class project used a hosted database connection. For the public portfolio version, database credentials were removed from `server.js` and replaced with environment variables.
